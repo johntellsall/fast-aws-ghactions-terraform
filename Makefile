@@ -9,3 +9,6 @@ plan: ping-aws
 
 auto-apply: ping-aws ## Apply terraform automatically -- DANGEROUS
 	terraform -chdir=tf-setup apply -auto-approve
+
+lint:
+	terraform -chdir=tf-setup fmt -recursive
