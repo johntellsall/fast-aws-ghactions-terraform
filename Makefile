@@ -2,13 +2,26 @@ all:
 
 ping-aws:  # ensure using Admin user and REGION set
 	aws sts get-caller-identity | grep 'user/admin"'
-	@env | grep AWS_REGION
+	@env | grep --silent AWS_REGION
 
 plan: ping-aws
-	terraform -chdir=tf-setup plan 
+	terraform plan 
 
 auto-apply: ping-aws ## Apply terraform automatically -- DANGEROUS
-	terraform -chdir=tf-setup apply -auto-approve
+	terraform apply -auto-approve
 
-lint:
-	terraform -chdir=tf-setup fmt -recursive
+# display file from S3 bucket johntellsall-202312-tf-state key    = "state/terraform.tfstate"
+show-remote-state: ping-aws
+	aws s3 ls johntellsall-202312-tf-state
+	aws s3api get-object --bucket johntellsall-202312-tf-state --key state/terraform.tfstate /dev/stdout
+# plan: ping-aws
+# 	terraform -chdir=tf-setup plan 
+
+# auto-apply: ping-aws ## Apply terraform automatically -- DANGEROUS
+# 	terraform -chdir=tf-setup apply -auto-approve
+
+format:
+	terraform fmt -recursive
+
+validate:
+	terraform -chdir=tf-setup validate
